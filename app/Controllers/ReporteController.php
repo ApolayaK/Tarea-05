@@ -150,4 +150,63 @@ class ReporteController extends BaseController
       echo $formatter->getMessage();
     }
   }
+
+public function getReport5()
+{
+    // Muestra el buscador y un contenedor vacío para los resultados
+    return view('reportes/reporte5');
+}
+
+public function ajaxReport5()
+{
+    $nombre = $this->request->getGet('nombre');
+
+    $query = "
+        SELECT id, superhero_name, full_name
+        FROM superhero
+        WHERE superhero_name LIKE ? OR full_name LIKE ?
+        ORDER BY superhero_name
+        LIMIT 20
+    ";
+
+    $heroes = $this->db->query($query, ["%$nombre%", "%$nombre%"])->getResultArray();
+
+    return $this->response->setJSON($heroes);
+}
+
+public function postReport5PDF()
+{
+    $heroId = $this->request->getPost('hero_id');
+
+    // Obtener datos del héroe
+    $hero = $this->db->query("SELECT superhero_name, full_name FROM superhero WHERE id = ?", [$heroId])->getRowArray();
+
+    // Obtener superpoderes
+    $powers = $this->db->query("
+        SELECT SP.power_name
+        FROM hero_power HP
+        JOIN superpower SP ON HP.power_id = SP.id
+        WHERE HP.hero_id = ?
+    ", [$heroId])->getResultArray();
+
+    $html = view('reportes/reporte5_pdf', [
+        'hero' => $hero,
+        'powers' => $powers,
+        'estilos' => view('reportes/estilos')
+    ]);
+
+    try {
+        $html2PDF = new \Spipu\Html2Pdf\Html2Pdf('P', 'A4', 'es', true, 'UTF-8', [10, 10, 10, 10]);
+        $html2PDF->writeHTML($html);
+        $this->response->setHeader('Content-Type', 'application/pdf');
+        $html2PDF->output('reporte-superpoderes.pdf');
+        exit();
+    } catch (\Spipu\Html2Pdf\Exception\Html2PdfException $e) {
+        $html2PDF->clean();
+        $formatter = new \Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
+        echo $formatter->getMessage();
+    }
+}
+
+
 }
