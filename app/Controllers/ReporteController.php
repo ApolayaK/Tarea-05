@@ -3,6 +3,10 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Models\Alignment;
+use App\Models\Publisher;
+use App\Models\Race;
+use App\Models\Superhero;
 use Spipu\Html2Pdf\Html2Pdf;
 use Spipu\Html2Pdf\Exception\Html2PdfException;
 use Spipu\Html2Pdf\Exception\ExceptionFormatter;
@@ -12,25 +16,83 @@ class ReporteController extends BaseController
   protected $db;
 
   public function __construct(){
-    $this->db = \Config\Database::connect();
+    $this->db = \Config\Database::connect(); //Acceso BD
   }
 
-  public function getReport1(){
-    $html = view('reportes/reporte1');
-    $html2PDF = new Html2Pdf();
-    $html2PDF->writeHTML($html);
-    $this->response->setHeader('Content-Type','application/pdf');
-    $html2PDF->output();
+  public function showUIReport(){
+    $publisher = new Publisher();
+    $race = new Race() ;
+    $alignment = new Alignment;
+
+    $data = [
+      'publishers'  =>$publisher->findAll(),
+      'estilos'     => $race->findAll(),
+      'superheros'  => $alignment->findAll(),
+    ];
+  
+    
+    return view('reportes/rpt-ui', $datos); //Devuelve la interfaz grafica (FORM HTML)
   }
 
-  public function getReport2(){
+  public function getReportByPublisher(){
+    $superhero = new Superhero();
+    $publisher_id = intval($this->request->getVar('publisher_id'));
+
+    $data = [
+      'estilos' => view('reportes/estilos'),
+      'superheros' => $superhero->getSuperHeroByPublisher($publisher_id)
+    ];
+    $html = view('reportes/rpt-superhero', $data);
+
+    try {
+      $html2PDF = new Html2Pdf('L', 'A4', 'es', true, 'UTF-8', [20, 10, 10, 10]);
+      $html2PDF->writeHTML($html);
+
+      $this->response->setHeader('Content-Type', 'application/pdf');
+      $html2PDF->output('Reporte-superhero-publisher.pdf');
+      exit();
+    } catch (Html2PdfException $e) {
+      $html2PDF->clean();
+      $formatter = new ExceptionFormatter($e);
+      echo $formatter->getMessage();
+    }
+  }
+
+  public function getReportByRaceAlignment(){
+    $superhero = new Superhero();
+
+    
+    $datos[
+      'estilos'   => view('reportes/estilos'),
+      'superhero' => $superhero->getSuperHeroByRaceAlignment(race_id: 1, alignment_id: 2)
+    ];
+    return view(name: 'reportes/rpt-superhero-ra', data: $datos);
+  
+  
+  }
+
+  public function getReport1()
+  {
+    $html = view('reportes/reporte1'); //Datos convertir en PDF
+
+    $html2PDF = new Html2Pdf(); //Librería
+    $html2PDF->writeHTML($html); //Contenido
+
+    //Definir el tipo de archivo que deberá renderizar la vista (navegador)
+    $this->response->setHeader('Content-Type', 'application/pdf');
+
+    $html2PDF->output(); //Generación
+  }
+
+  public function getReport2()
+  {
     $data = [
       "area" => "Sistemas",
-      "autor" => "Apolaya Schrader Mariana",
+      "autor" => "Jhon Francia Minaya",
       "productos" => [
         ["id" => 1, "descripcion" => "Monitor", "precio" => 750],
         ["id" => 2, "descripcion" => "Impresora", "precio" => 500],
-        ["id" => 3, "descripcion" => "WebCam", "precio" => 220],
+        ["id" => 3, "descripcion" => "WebCam", "precio" => 220]
       ],
       "estilos" => view('reportes/estilos')
     ];
@@ -38,11 +100,12 @@ class ReporteController extends BaseController
     $html = view('reportes/reporte2', $data);
 
     try {
-      $html2PDF = new Html2Pdf('P','A4','es',true,'UTF-8',[10,10,10,10]);
+      $html2PDF = new Html2Pdf('P', 'A4', 'es', true, 'UTF-8', [20, 10, 10, 10]);
       $html2PDF->writeHTML($html);
-      $this->response->setHeader('Content-Type','application/pdf');
+
+      $this->response->setHeader('Content-Type', 'application/pdf');
       $html2PDF->output('Reporte-Finanzas.pdf');
-      exit();
+      //exit(); //Opcional
     } catch (Html2PdfException $e) {
       $html2PDF->clean();
       $formatter = new ExceptionFormatter($e);
@@ -50,163 +113,43 @@ class ReporteController extends BaseController
     }
   }
 
-  public function getReport3(){
+  public function getReport3()
+  {    
+    //Consulta SQL
     $query = "
-      SELECT
-        SH.id,
-        SH.superhero_name,
-        SH.full_name,
-        PB.publisher_name,
-        AL.alignment
-      FROM superhero SH
+    SELECT
+      SH.id,
+      SH.superhero_name,
+      SH.full_name,
+      PB.publisher_name,
+      AL.alignment
+      FROM superhero SH 
       LEFT JOIN publisher PB ON SH.publisher_id = PB.id
       LEFT JOIN alignment AL ON SH.alignment_id = AL.id
-      ORDER BY PB.publisher_name
+      ORDER BY 4
       LIMIT 150;
     ";
 
-    $rows = $this->db->query($query)->getResultArray();
-
+    $rows = $this->db->query($query); //Ejecutar consulta
     $data = [
-      "rows" => $rows,
+      "rows"    => $rows->getResultArray(), //Almacenr los datos en un arreglo 
       "estilos" => view('reportes/estilos')
-    ];
+    ]; 
 
     $html = view('reportes/reporte3', $data);
 
     try {
-      $html2PDF = new Html2Pdf('L','A4','es',true,'UTF-8',[10,10,10,10]);
+      $html2PDF = new Html2Pdf('L', 'A4', 'es', true, 'UTF-8', [20, 10, 10, 10]);
       $html2PDF->writeHTML($html);
-      $this->response->setHeader('Content-Type','application/pdf');
+
+      $this->response->setHeader('Content-Type', 'application/pdf');
       $html2PDF->output('Reporte-superhero.pdf');
-      exit();
+      exit(); //Opcional
     } catch (Html2PdfException $e) {
       $html2PDF->clean();
       $formatter = new ExceptionFormatter($e);
       echo $formatter->getMessage();
     }
   }
-
-  public function getFiltro(){
-    $publishers = $this->db->query("SELECT id, publisher_name FROM publisher ORDER BY publisher_name")->getResultArray();
-    return view('reportes/filtro', ['publishers' => $publishers]);
-  }
-
-  public function postFiltro(){
-    $publisherId = $this->request->getPost('publisher_id');
-
-    $query = "
-      SELECT
-        SH.id,
-        SH.superhero_name,
-        SH.full_name,
-        SH.publisher_id,
-        PB.publisher_name,
-        AL.alignment
-      FROM superhero SH
-      LEFT JOIN publisher PB ON SH.publisher_id = PB.id
-      LEFT JOIN alignment AL ON SH.alignment_id = AL.id
-      WHERE PB.id = ?
-      ORDER BY SH.superhero_name
-    ";
-
-    $heroes = $this->db->query($query, [$publisherId])->getResultArray();
-
-    return view('reportes/filtro_resultado', ['heroes' => $heroes]);
-  }
-
-  public function postFiltroPDF(){
-    $publisherId = $this->request->getPost('publisher_id');
-
-    $query = "
-      SELECT
-        SH.id,
-        SH.superhero_name,
-        SH.full_name,
-        PB.publisher_name,
-        AL.alignment
-      FROM superhero SH
-      LEFT JOIN publisher PB ON SH.publisher_id = PB.id
-      LEFT JOIN alignment AL ON SH.alignment_id = AL.id
-      WHERE PB.id = ?
-      ORDER BY SH.superhero_name
-    ";
-
-    $heroes = $this->db->query($query, [$publisherId])->getResultArray();
-
-    $html = view('reportes/reporte4', [
-      'rows' => $heroes,
-      'estilos' => view('reportes/estilos')
-    ]);
-
-    try {
-      $html2PDF = new Html2Pdf('L','A4','es',true,'UTF-8',[10,10,10,10]);
-      $html2PDF->writeHTML($html);
-      $html2PDF->output('reporte-filtrado.pdf');
-      exit();
-    } catch (Html2PdfException $e) {
-      $html2PDF->clean();
-      $formatter = new ExceptionFormatter($e);
-      echo $formatter->getMessage();
-    }
-  }
-
-public function getReport5()
-{
-    // Muestra el buscador y un contenedor vacío para los resultados
-    return view('reportes/reporte5');
-}
-
-public function ajaxReport5()
-{
-    $nombre = $this->request->getGet('nombre');
-
-    $query = "
-        SELECT id, superhero_name, full_name
-        FROM superhero
-        WHERE superhero_name LIKE ? OR full_name LIKE ?
-        ORDER BY superhero_name
-        LIMIT 20
-    ";
-
-    $heroes = $this->db->query($query, ["%$nombre%", "%$nombre%"])->getResultArray();
-
-    return $this->response->setJSON($heroes);
-}
-
-public function postReport5PDF()
-{
-    $heroId = $this->request->getPost('hero_id');
-
-    // Obtener datos del héroe
-    $hero = $this->db->query("SELECT superhero_name, full_name FROM superhero WHERE id = ?", [$heroId])->getRowArray();
-
-    // Obtener superpoderes
-    $powers = $this->db->query("
-        SELECT SP.power_name
-        FROM hero_power HP
-        JOIN superpower SP ON HP.power_id = SP.id
-        WHERE HP.hero_id = ?
-    ", [$heroId])->getResultArray();
-
-    $html = view('reportes/reporte5_pdf', [
-        'hero' => $hero,
-        'powers' => $powers,
-        'estilos' => view('reportes/estilos')
-    ]);
-
-    try {
-        $html2PDF = new \Spipu\Html2Pdf\Html2Pdf('P', 'A4', 'es', true, 'UTF-8', [10, 10, 10, 10]);
-        $html2PDF->writeHTML($html);
-        $this->response->setHeader('Content-Type', 'application/pdf');
-        $html2PDF->output('reporte-superpoderes.pdf');
-        exit();
-    } catch (\Spipu\Html2Pdf\Exception\Html2PdfException $e) {
-        $html2PDF->clean();
-        $formatter = new \Spipu\Html2Pdf\Exception\ExceptionFormatter($e);
-        echo $formatter->getMessage();
-    }
-}
-
 
 }

@@ -6,22 +6,23 @@
   <title>Reporte</title>
 </head>
 <body>
-
-<!-- Estilos CSS -->
+  
+  <!-- Estilos CSS -->
   <?= $estilos ?>
-    <div class="text-center mb-1">
-      <h1>Reporte de ventas</h1>
-      <h2>Área <?= $area ?></h2>
-    </div>
+
+  <div class="text-center mb-1">
+    <h2>Reporte de ventas</h2>
+    <h3>Área <?= $area ?></h3>
+  </div>
 
   <table class="table mb-2">
     <colgroup>
-      <col style="width:10%">
-      <col style="width:60%">
-      <col style="width:30%">
+      <col style="width: 10%;">
+      <col style="width: 60%;">
+      <col style="width: 30%;">
     </colgroup>
     <thead>
-      <tr class="bg-secondary">
+      <tr class="bg-primary text-light">
         <th>#</th>
         <th>Producto</th>
         <th>Precio</th>
@@ -30,9 +31,9 @@
     <tbody>
       <?php foreach($productos as $producto): ?>
       <tr>
-        <th><?= $producto['id']?></th>
-        <th><?= $producto['descripcion']?></th>
-        <th><?= $producto['precio']?></th>
+        <td><?= $producto['id'] ?></td>
+        <td><?= $producto['descripcion'] ?></td>
+        <td><?= $producto['precio'] ?></td>
       </tr>
       <?php endforeach; ?>
     </tbody>

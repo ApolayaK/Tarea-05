@@ -1,35 +1,68 @@
-# Proyecto Superhero – Avances
+# CodeIgniter 4 Application Starter
 
-## Resumen de avances
-- Configuración del proyecto en CodeIgniter 4 con Composer, VirtualHost, hosts, base de datos y archivo `.env`.  
-- Instalación de la librería `spipu/html2pdf` para la generación de reportes en PDF.  
-- Implementación de reportes iniciales:
-  - Reporte 01: resumen en PDF.  
-  - Reporte 02: reporte de ventas dinámico.  
-  - Reporte 03: listado de superhéroes en PDF.  
-  - Reporte 04: filtro por `publisher` con exportación a PDF.  
+## What is CodeIgniter?
 
----
+CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
+More information can be found at the [official site](https://codeigniter.com).
 
-## Reporte 05 – Buscador de Superhéroes (Finalizado)
+This repository holds a composer-installable app starter.
+It has been built from the
+[development repository](https://github.com/codeigniter4/CodeIgniter4).
 
-| Funcionalidad | Descripción |
-|---------------|-------------|
-| **Búsqueda Asincrónica (AJAX)** | Filtra resultados en tiempo real a partir del segundo carácter ingresado. |
-| **Visualización Dinámica** | Resultados mostrados en **tabla interactiva** con ID, nombre, alias y acción. |
-| **Exportación a PDF** | Botón para generar PDF con superpoderes del héroe en **tabla estilizada** con encabezado y pie de página. |
-| **Experiencia de Usuario** | Fluida y sin recargas de página, manteniendo consistencia con el resto de reportes. |
+More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
 
----
+You can read the [user guide](https://codeigniter.com/user_guide/)
+corresponding to the latest version of the framework.
 
-## Recomendaciones de Mejora
-- **Agregar paginación** a la tabla de resultados para evitar sobrecarga si hay demasiados héroes.  
-- **Resaltar coincidencias** en el buscador (por ejemplo, subrayar el texto que coincide con la búsqueda).  
-- **Mostrar detalles extra** del héroe en un modal (imagen, biografía breve, afiliación).  
-- **Optimizar la consulta SQL** usando índices para mejorar la velocidad en bases de datos con gran cantidad de registros.  
-- **Validación extra en frontend**, evitando consultas si el usuario borra el texto rápidamente.  
+## Installation & updates
 
----
+`composer create-project codeigniter4/appstarter` then `composer update` whenever
+there is a new release of the framework.
 
-**Conclusión:**  
-El Reporte 05 quedó completamente funcional, implementando búsqueda en tiempo real y exportación a PDF, siguiendo el flujo de los reportes anteriores y mejorando la experiencia del usuario.
+When updating, check the release notes to see if there are any changes you might need to apply
+to your `app` folder. The affected files can be copied or merged from
+`vendor/codeigniter4/framework/app`.
+
+## Setup
+
+Copy `env` to `.env` and tailor for your app, specifically the baseURL
+and any database settings.
+
+## Important Change with index.php
+
+`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
+for better security and separation of components.
+
+This means that you should configure your web server to "point" to your project's *public* folder, and
+not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
+framework are exposed.
+
+**Please** read the user guide for a better explanation of how CI4 works!
+
+## Repository Management
+
+We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
+We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
+FEATURE REQUESTS.
+
+This repository is a "distribution" one, built by our release preparation script.
+Problems with it can be raised on our forum, or as issues in the main repository.
+
+## Server Requirements
+
+PHP version 8.1 or higher is required, with the following extensions installed:
+
+- [intl](http://php.net/manual/en/intl.requirements.php)
+- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+
+> [!WARNING]
+> - The end of life date for PHP 7.4 was November 28, 2022.
+> - The end of life date for PHP 8.0 was November 26, 2023.
+> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
+> - The end of life date for PHP 8.1 will be December 31, 2025.
+
+Additionally, make sure that the following extensions are enabled in your PHP:
+
+- json (enabled by default - don't turn it off)
+- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
+- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library

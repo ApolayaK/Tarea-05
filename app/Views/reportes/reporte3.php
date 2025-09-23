@@ -4,17 +4,18 @@
   <page_header>
     [[page_cu]]/[[page_nb]]
   </page_header>
+
   <page_footer>
-    Lista de superhero
+    Lista de superhéroes
   </page_footer>
-    
+
   <table class="table">
     <colgroup>
-      <col style="width:5%">
-      <col style="width:25%">
-      <col style="width:30%">
-      <col style="width:25%">
-      <col style="width:15%">
+      <col style="width: 5%">
+      <col style="width: 25%">
+      <col style="width: 30%">
+      <col style="width: 25%">
+      <col style="width: 15%">
     </colgroup>
     <thead>
       <tr>
@@ -37,4 +38,5 @@
       <?php endforeach; ?>
     </tbody>
   </table>
-  </page>
+
+</page>
