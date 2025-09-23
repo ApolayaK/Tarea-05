@@ -7,15 +7,15 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
-//Reportes
+// Reportes
 $routes->get('/reportes/r1', 'ReporteController::getReport1');
 $routes->get('/reportes/r2', 'ReporteController::getReport2');
 $routes->get('/reportes/r3', 'ReporteController::getReport3');
 
-//Muestra una interfaz Web (form) para que el USUARIO sleccione un "tipo de reporte" a generar
+// Muestra la interfaz Web (form) para seleccionar tipo de reporte
 $routes->get('/reportes/showui','ReporteController::showUIReport');
 $routes->post('/reportes/publisher','ReporteController::getReportByPublisher');
-$routes->post('/reportes/racealignment','getReportByRaceAlignment');
+$routes->post('/reportes/racealignment','ReporteController::getReportByRaceAlignment');
 
-//Dashoboard 
+// Dashboard 
 $routes->get('/dashboard/informe1','DashboardController::getInforme1');
